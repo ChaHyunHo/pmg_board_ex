@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:security="http://www.springframework.org/schema/security"
+   xsi:schemaLocation="http://www.springframework.org/schema/security 
+      http://www.springframework.org/schema/security/spring-security.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+   
+   <!-- 설정 빈등록  -->
+   <bean id="loginSuccess" class="com.test.example.security.LoginSuccessHandler"/>
+   <bean id="logoutSuccess" class="com.test.example.security.LogoutSuccessHandler"></bean>
+   <bean id="customUserDetailsService" class="com.test.example.security.CustomUserDetailsService"></bean>
+   <bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
+   
+   <bean id="customAccessDenied" class="com.test.example.security.CustomAccessDeniedHandler"></bean>
+   
+   <!-- 로그인 실패 처리 bean 등록 -->
+	<bean id="loginFailure" class="com.test.example.security.LoginFailureHandler">
+		<property name="loginusername" value="username" />
+		<property name="loginpwdname" value="password" />
+		<property name="errormsgname" value="ERRORMSG" />
+		<property name="defaultFailureUrl" value="/loginform?error" />
+	</bean>
+      
+   <!-- 시큐리티 url 설정  -->   
+   <security:http>
+   	  
+   	  <!-- 게시글 등록 -->
+      <security:intercept-url pattern="/board/dynamic/boardreg" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" />
+      
+      <!-- 업데이트 -->
+      <security:intercept-url pattern="/board/dynamic/boardupdateform" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" />
+      
+      <!-- 게시판 url  -->
+      <security:intercept-url pattern="/board/**" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" />
+      
+      <!-- 로그인 폼 커스텀 설정 -->
+      <security:form-login 
+        login-page="/loginform" 
+        login-processing-url="/loginform"
+      	authentication-success-handler-ref="loginSuccess" 
+      	authentication-failure-handler-ref="loginFailure" 
+      	/> 
+	  
+	  <!-- 로그아웃 설정 -->      
+      <security:logout logout-url="/logoutform" success-handler-ref="logoutSuccess" invalidate-session="true" />
+      
+      <!-- 로그아웃 쿠키 삭제 -->
+      <security:logout logout-url="/logoutform" invalidate-session="true" delete-cookies="remember-me, JSESSION_ID" />
+      
+      <!-- csrf토큰 설정취소  -->
+      <security:csrf disabled="true" />
+      
+	  <security:access-denied-handler ref="customAccessDenied"/>
+      
+   </security:http> 
+   
+   <!-- provider -->
+   <security:authentication-manager>
+   	  <!-- customUserDetail 통한 인증 설정  -->
+      <security:authentication-provider user-service-ref="customUserDetailsService">
+      		<!-- password encode 설정  -->
+			<security:password-encoder ref="bcryptPasswordEncoder" />
+		</security:authentication-provider>
+   </security:authentication-manager>
+</beans>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+	
+	<insert id="insert">
+		INSERT INTO 
+			board
+				 (
+					 title
+					,content
+					,writer
+					,category
+					,id
+				 ) 
+		VALUES	 
+			 	 (
+				 	 #{title}
+				 	,#{content}
+				 	,#{writer}
+				 	,#{category}
+				 	,#{id}
+				 )
+	</insert>
+
+	<select id="read" resultType="boardVO">
+		SELECT
+			b.bno,
+			b.title,
+			b.content,
+			b.writer,
+			b.register_date,
+			b.update_date,
+			b.view_count,
+			b.category,
+			b.id
+		FROM
+			board b
+		WHERE
+			bno = #{bno}
+	</select>
+	
+	<update id="update">
+		UPDATE 
+			board 
+		SET 
+			  title       = #{title}
+			, content     = #{content}
+			, writer  	  = #{writer}
+			, update_date = sysdate()
+		WHERE 
+			bno = #{bno}
+	
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM 
+			board 
+		WHERE 
+			bno = #{bno}
+	
+	</delete>
+
+	<select id="listAll" resultType="boardVO">
+		SELECT 
+			@rownum:=@rownum+1 AS newcount,
+			b.bno,
+			b.title,
+			b.content,
+			b.writer,
+			b.register_date,
+			b.update_date,
+			b.view_count,
+			b.category
+		FROM 
+			board b,
+			(SELECT @ROWNUM :=0) R
+		WHERE
+			<include refid="myBoard"></include>
+			category = 'MEM'
+			<include refid="search"></include>
+		
+		ORDER BY 
+			newcount DESC
+		LIMIT ${pageStart}, ${perPageNum}
+	</select>
+	
+	<select id="listTotalCount" resultType="int">
+		SELECT 
+			count(*)
+		FROM 
+			board 
+		WHERE	
+		<include refid="myBoard"></include>
+			category = 'MEM'
+		<include refid="search"></include>
+		
+	</select>
+	
+	<update id="updateView">
+		UPDATE board b SET
+			b.view_count = (SELECT view_count FROM board WHERE bno = #{bno}) + 1
+		WHERE 
+			b.bno = #{bno}
+	</update>
+	
+	<select id="noticeList" resultType="boardVO">
+		SELECT 
+			@rownum:=@rownum+1 AS newcount,
+			b.bno,
+			b.title,
+			b.content,
+			b.writer,
+			b.register_date,
+			b.update_date,
+			b.view_count,
+			b.category
+		FROM 
+			board b,
+			(SELECT @ROWNUM :=0) R
+		WHERE
+			category = 'ADMIN'
+		ORDER BY 
+			newcount DESC
+	</select>
+	
+	<select id="orderList" resultType="boardVO">
+		SELECT *
+			FROM(
+					SELECT
+						@rownum := @rownum + 1 AS newcount,
+						b.bno,
+						b.title,
+						b.content,
+						b.writer,
+						b.register_date,
+						b.update_date,
+						b.view_count,
+						b.category
+					FROM board b,
+						(SELECT @rownum := 0 ) TMP
+					WHERE 
+					<include refid="myBoard"></include>
+					category = 'MEM'
+					<include refid="search"></include>
+					
+					<include refid="order"></include>
+					)sub
+		ORDER BY 
+			sub.newcount DESC
+		LIMIT ${pageStart}, ${perPageNum}
+	</select>
+	
+	<sql id="order">
+		<if test="order != null">
+			<if test="order == 'RA'.toString()">
+				ORDER BY register_date DESC
+			</if>
+			<if test="order == 'RD'.toString()">
+				ORDER BY register_date ASC
+			</if>
+			<if test="order == 'UA'.toString()">
+				ORDER BY update_date DESC
+			</if>
+			<if test="order == 'UD'.toString()">
+				ORDER BY update_date ASC
+			</if>
+			<if test="order == 'VA'.toString()">
+				ORDER BY view_count DESC
+			</if>
+			<if test="order == 'VD'.toString()">
+				ORDER BY view_count ASC
+			</if>
+		
+		</if>
+	</sql>
+	
+	<sql id="search"> 
+		<if test="searchTitle != null">
+			<if test="searchType != null"></if>
+				<if test="searchType == 'T'.toString()">
+					AND
+					title like CONCAT('%', #{searchTitle}, '%')	
+				</if>
+				<if test="searchType == 'W'.toString()">
+					AND
+					writer like CONCAT('%', #{searchTitle}, '%')	
+				</if>
+				<if test="searchType == 'TC'.toString()">
+					AND
+						(
+							title like CONCAT('%', #{searchTitle}, '%')
+							or
+							content like CONCAT('%', #{searchTitle}, '%')
+						)
+				</if>
+				<if test="searchType == ''.toString()">
+					AND
+					(
+						writer like CONCAT('%', #{searchTitle}, '%')
+						or
+						title like CONCAT('%', #{searchTitle}, '%')
+					)
+				</if>
+		</if>
+	</sql>
+	
+	<sql id="myBoard">
+		<if test="myBoardIdx != null and myBoardIdx != ''">
+			id = #{myBoardIdx}
+			AND
+		</if>
+	</sql> 
+</mapper>
