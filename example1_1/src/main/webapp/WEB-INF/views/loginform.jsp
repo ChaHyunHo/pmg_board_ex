@@ -44,11 +44,11 @@
 							<input type="password" class="form-control form-control-user" id="password" name="password" autocomplete="off"  placeholder="비밀번호">
 						</div>
 						<div id="loginCheck" style="color: red; font-size: 12px;  margin-bottom: 5px;"></div>
-						<div class="form-group">
+					<!-- 	<div class="form-group">
 							<div class="custom-control custom-checkbox small">
 								<input type="checkbox" class="custom-control-input" id="customCheck" name='remember-me'> <label class="custom-control-label" for="customCheck">Remember Me</label>
 							</div>
-						</div>
+						</div> -->
 						<button id="loginBtn" type="submit" style="font-size: 20px;"
 							class="btn btn-primary btn-user btn-block">로그인</button>
 				  </form>

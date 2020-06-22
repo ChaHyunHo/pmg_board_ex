@@ -20,14 +20,6 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@RequestMapping(value = "/read", method = RequestMethod.GET)
-	public String read(UserVO user) throws Exception {
-		log.info("/user/read");
-		UserVO vo = userService.read(user.getEmail());
-		log.info(vo);
-		return null;
-	}
-	
 	/**
 	 * 회원가입 폼
 	 * @param user

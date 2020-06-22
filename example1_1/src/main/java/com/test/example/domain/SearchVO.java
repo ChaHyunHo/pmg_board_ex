@@ -9,5 +9,6 @@ public class SearchVO extends PageVO {
 	private String searchType;
 	private String order ="";
 	private Integer myBoardIdx;
+	private Integer tempIdx;
 	
 }

@@ -37,6 +37,7 @@
 
   <!-- Page level custom scripts -->
   <script src="/resources/js/demo/datatables-demo.js"></script>
+  
 
 </body>
 

@@ -1,6 +1,7 @@
 package com.test.example.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.ibatis.type.Alias;
 
@@ -20,5 +21,7 @@ public class BoardVO {
 	private String category;       // 게시글 카테고리
 	private boolean newLabel = false; // 게시글 NEW 라벨
 	private Integer id;
+	
+	private List<BoardFileVO> attachList;
 	
 }

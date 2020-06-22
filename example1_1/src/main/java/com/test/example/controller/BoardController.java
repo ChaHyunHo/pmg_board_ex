@@ -10,13 +10,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.test.example.domain.BoardFileVO;
 import com.test.example.domain.BoardVO;
 import com.test.example.domain.PageDTO;
 import com.test.example.domain.SearchVO;
@@ -54,10 +61,10 @@ public class BoardController {
 	 */
 	@PreAuthorize("isAuthenticated()")
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public ModelAndView register(BoardVO vo) throws Exception {
+	public ModelAndView register(BoardVO vo, @RequestParam(value="file") List<MultipartFile> fileList) throws Exception {
 		String page = "/board/dynamic/boardform";
 		
-		ModelAndView mav = new ModelAndView(page);;
+		ModelAndView mav = new ModelAndView(page);
 		
 		try {
 			int result = boardService.insert(vo);
@@ -405,6 +412,16 @@ public class BoardController {
 		}
 		
 		return mav;
+	}
+	
+	@GetMapping(value = "/getAttachList", 
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseBody
+	public ResponseEntity<List<BoardFileVO>> getAttachList(Long bno) throws Exception {
+		
+		log.info("getAttachList : " + bno);
+		
+		return null; //new ResponseEntity<>(service.getAttachList(bno), HttpStatus.OK);
 	}
 
 }

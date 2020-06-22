@@ -4,6 +4,66 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="board">
+	<sql id="order">
+		<if test="order != null">
+			<if test="order == 'RA'.toString()">
+				ORDER BY register_date DESC
+			</if>
+			<if test="order == 'RD'.toString()">
+				ORDER BY register_date ASC
+			</if>
+			<if test="order == 'UA'.toString()">
+				ORDER BY update_date DESC
+			</if>
+			<if test="order == 'UD'.toString()">
+				ORDER BY update_date ASC
+			</if>
+			<if test="order == 'VA'.toString()">
+				ORDER BY view_count DESC
+			</if>
+			<if test="order == 'VD'.toString()">
+				ORDER BY view_count ASC
+			</if>
+		
+		</if>
+	</sql>
+	
+	<sql id="search"> 
+		<if test="searchTitle != null">
+			<if test="searchType != null"></if>
+				<if test="searchType == 'T'.toString()">
+					AND
+					title like CONCAT('%', #{searchTitle}, '%')	
+				</if>
+				<if test="searchType == 'W'.toString()">
+					AND
+					writer like CONCAT('%', #{searchTitle}, '%')	
+				</if>
+				<if test="searchType == 'TC'.toString()">
+					AND
+						(
+							title like CONCAT('%', #{searchTitle}, '%')
+							or
+							content like CONCAT('%', #{searchTitle}, '%')
+						)
+				</if>
+				<if test="searchType == ''.toString()">
+					AND
+					(
+						writer like CONCAT('%', #{searchTitle}, '%')
+						or
+						title like CONCAT('%', #{searchTitle}, '%')
+					)
+				</if>
+		</if>
+	</sql>
+	
+	<sql id="myBoard">
+		<if test="myBoardIdx != null and myBoardIdx != ''">
+			id = #{myBoardIdx}
+			AND
+		</if>
+	</sql> 
 	
 	<insert id="insert">
 		INSERT INTO 
@@ -140,7 +200,7 @@
 						b.view_count,
 						b.category
 					FROM board b,
-						(SELECT @rownum := 0 ) TMP
+						(SELECT @rownum := 0 ) R
 					WHERE 
 					<include refid="myBoard"></include>
 					category = 'MEM'
@@ -153,64 +213,5 @@
 		LIMIT ${pageStart}, ${perPageNum}
 	</select>
 	
-	<sql id="order">
-		<if test="order != null">
-			<if test="order == 'RA'.toString()">
-				ORDER BY register_date DESC
-			</if>
-			<if test="order == 'RD'.toString()">
-				ORDER BY register_date ASC
-			</if>
-			<if test="order == 'UA'.toString()">
-				ORDER BY update_date DESC
-			</if>
-			<if test="order == 'UD'.toString()">
-				ORDER BY update_date ASC
-			</if>
-			<if test="order == 'VA'.toString()">
-				ORDER BY view_count DESC
-			</if>
-			<if test="order == 'VD'.toString()">
-				ORDER BY view_count ASC
-			</if>
-		
-		</if>
-	</sql>
 	
-	<sql id="search"> 
-		<if test="searchTitle != null">
-			<if test="searchType != null"></if>
-				<if test="searchType == 'T'.toString()">
-					AND
-					title like CONCAT('%', #{searchTitle}, '%')	
-				</if>
-				<if test="searchType == 'W'.toString()">
-					AND
-					writer like CONCAT('%', #{searchTitle}, '%')	
-				</if>
-				<if test="searchType == 'TC'.toString()">
-					AND
-						(
-							title like CONCAT('%', #{searchTitle}, '%')
-							or
-							content like CONCAT('%', #{searchTitle}, '%')
-						)
-				</if>
-				<if test="searchType == ''.toString()">
-					AND
-					(
-						writer like CONCAT('%', #{searchTitle}, '%')
-						or
-						title like CONCAT('%', #{searchTitle}, '%')
-					)
-				</if>
-		</if>
-	</sql>
-	
-	<sql id="myBoard">
-		<if test="myBoardIdx != null and myBoardIdx != ''">
-			id = #{myBoardIdx}
-			AND
-		</if>
-	</sql> 
 </mapper>

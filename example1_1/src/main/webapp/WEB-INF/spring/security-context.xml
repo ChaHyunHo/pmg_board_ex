@@ -25,8 +25,13 @@
    <!-- 시큐리티 url 설정  -->   
    <security:http>
    	  
+   	  <security:intercept-url pattern="/main/**" access="permitAll" />
+   	  
    	  <!-- 게시글 등록 -->
       <security:intercept-url pattern="/board/dynamic/boardreg" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" />
+      
+       <!-- 상세페이지 -->
+      <security:intercept-url pattern="/board/dynamic/boardgetform" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" />
       
       <!-- 업데이트 -->
       <security:intercept-url pattern="/board/dynamic/boardupdateform" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" />
